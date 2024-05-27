@@ -46,6 +46,7 @@ allInputDiv.style.gap="20px";
 
 form.action='/create';
 form.method='post';
+
 inTitle.name="title";
 inTitle.type="text";
 inTitle.size="60";
