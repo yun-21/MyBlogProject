@@ -45,6 +45,20 @@ const server = http.createServer((request, response) => {
       response.write(write);
       response.end();
     }
+    if (request.url ==='/writeData.html'){
+      const writeData = fs.readFileSync("./public/writeData.html","utf8");
+      response.statusCode=200;
+      response.setHeader('Content-Type','text/html; charset=utf-8');
+      response.write(writeData);
+      response.end();
+    }
+    if (request.url ==='/writeData.js'){
+      const writeDatajs = fs.readFileSync("./public/writeData.js","utf8");
+      response.statusCode=200;
+      response.setHeader('Content-Type','text/javascript; charset=utf-8');
+      response.write(writeDatajs);
+      response.end();
+    }
   }
   else if (request.method === 'POST') {
     if (request.url === '/create') {
@@ -64,13 +78,13 @@ const server = http.createServer((request, response) => {
         };
         const jsonDataString = JSON.stringify(jsonData, null, 2);
         fs.writeFileSync("./public/data.json", jsonDataString);
-        const dataJson = fs.readFileSync("./public/data.json");
-        const parseDataJson = JSON.parse(dataJson);
-        const array=[];
-        for(let key in parseDataJson){
-          array.push(parseDataJson[key]);
-        }
-        response.write(JSON.stringify(array));
+        // const dataJson = fs.readFileSync("./public/data.json");
+        // const parseDataJson = JSON.parse(dataJson);
+        // const array=[];
+        // for(let key in parseDataJson){
+          // array.push(parseDataJson[key]);
+        // }
+        // response.write(JSON.stringify(array));
       });
     }
   }
