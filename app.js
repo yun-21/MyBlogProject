@@ -78,7 +78,18 @@ const server = http.createServer((request, response) => {
           content: content
         };
         let jsonDataString = JSON.stringify(jsonData, null, 2);
-        fs.writeFileSync(`./public/${todayDate()}-data.json`, jsonDataString,"utf-8");
+        fs.writeFileSync(`./public/data/${todayDate()}-data.json`, jsonDataString,"utf-8");
+        // const main = fs.readFileSync("./public/main.html", "utf8");
+        // response.write(main);
+        var testFolder = "./public/data"
+        fs.readdir(testFolder,function(error,filelist){
+          const htmlcontent = `<html><head><body><h1><a>${filelist}</h1><br></body></head></html>`
+          // console.log(filelist);
+          response.write(htmlcontent);
+          response.end();
+        });
+        // const htmlcontent = ``
+        // response.end();
       });
     }
   }
