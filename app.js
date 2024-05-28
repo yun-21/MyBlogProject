@@ -1,6 +1,6 @@
 const http = require('http');
 const fs = require('fs');
-const todayDate = require("./todayDate");
+const todayDate = require("./public/todayDate");
 
 const server = http.createServer((request, response) => {
   if (request.method === 'GET') {
@@ -77,8 +77,8 @@ const server = http.createServer((request, response) => {
           title: title,
           content: content
         };
-        const jsonDataString = JSON.stringify(jsonData, null, 2);
-        fs.writeFileSync(`${todayDate()}data.json`, jsonDataString);
+        let jsonDataString = JSON.stringify(jsonData, null, 2);
+        fs.writeFileSync(`./public/${todayDate()}-data.json`, jsonDataString,"utf-8");
       });
     }
   }
