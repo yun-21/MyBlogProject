@@ -46,17 +46,17 @@ const server = http.createServer((request, response) => {
       response.write(write);
       response.end();
     }
-    if (request.url ==='/writeData.html'){
-      const writeData = fs.readFileSync("./public/writeData.html","utf8");
-      response.statusCode=200;
-      response.setHeader('Content-Type','text/html; charset=utf-8');
+    if (request.url === '/writeData.html') {
+      const writeData = fs.readFileSync("./public/writeData.html", "utf8");
+      response.statusCode = 200;
+      response.setHeader('Content-Type', 'text/html; charset=utf-8');
       response.write(writeData);
       response.end();
     }
-    if (request.url ==='/writeData.js'){
-      const writeDatajs = fs.readFileSync("./public/writeData.js","utf8");
-      response.statusCode=200;
-      response.setHeader('Content-Type','text/javascript; charset=utf-8');
+    if (request.url === '/writeData.js') {
+      const writeDatajs = fs.readFileSync("./public/writeData.js", "utf8");
+      response.statusCode = 200;
+      response.setHeader('Content-Type', 'text/javascript; charset=utf-8');
       response.write(writeDatajs);
       response.end();
     }
@@ -78,18 +78,48 @@ const server = http.createServer((request, response) => {
           content: content
         };
         let jsonDataString = JSON.stringify(jsonData, null, 2);
-        fs.writeFileSync(`./public/data/${todayDate()}-data.json`, jsonDataString,"utf-8");
+        fs.writeFileSync(`./public/data/${todayDate()}-data.json`, jsonDataString, "utf-8");
         // const main = fs.readFileSync("./public/main.html", "utf8");
         // response.write(main);
         var testFolder = "./public/data"
-        fs.readdir(testFolder,function(error,filelist){
-          const htmlcontent = `<html><head><body><h1><a>${filelist}</h1><br></body></head></html>`
+        fs.readdir(testFolder, function (error, filelist) {
+          // for (let i = 0; i < filelist.length; i++) {
+          //   var cook = `<li>${filelist[i]}</li>`;
+          // }
+          const htmlcontent = `
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Document</title>
+          </head>
+          <body>
+            <div id="root">
+            </div>
+          </body>
+          <script>
+          const root = document.getElementById("root");
+          
+          
+          const testArr = ${filelist.map((element) => element )};
+          console.log(testArr);
+          ${filelist.map(element => `
+          console.log(element)
+          const li = document.createElement('li'); 
+          li.textContent = element;
+          root.appendChild(li)`)};
+            
+          const write = document.createElement('a');
+          root.appendChild(write);
+          write.href="../";
+          write.innerHTML="qq";
+          </script>
+          </html>`
           // console.log(filelist);
           response.write(htmlcontent);
           response.end();
         });
-        // const htmlcontent = ``
-        // response.end();
       });
     }
   }
