@@ -1,5 +1,6 @@
 const http = require('http');
 const fs = require('fs');
+const todayDate = require("./todayDate");
 
 const server = http.createServer((request, response) => {
   if (request.method === 'GET') {
@@ -76,16 +77,8 @@ const server = http.createServer((request, response) => {
           title: title,
           content: content
         };
-        let count = 1;
         const jsonDataString = JSON.stringify(jsonData, null, 2);
-        fs.writeFileSync(`./public/data${count}.json`, jsonDataString);
-        // const dataJson = fs.readFileSync("./public/data.json");
-        // const parseDataJson = JSON.parse(dataJson);
-        // const array=[];
-        // for(let key in parseDataJson){
-          // array.push(parseDataJson[key]);
-        // }
-        // response.write(JSON.stringify(array));11
+        fs.writeFileSync(`${todayDate()}data.json`, jsonDataString);
       });
     }
   }
