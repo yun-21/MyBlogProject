@@ -86,7 +86,7 @@ const server = http.createServer((request, response) => {
           // array.push(parseDataJson[key]);
         // }
         // response.write(JSON.stringify(array));11
-      });1
+      });
     }
   }
 });
