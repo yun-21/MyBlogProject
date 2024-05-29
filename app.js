@@ -77,10 +77,14 @@ const server = http.createServer((request, response) => {
           title: title,
           content: content
         };
-        let jsonDataString = JSON.stringify(jsonData, null, 2);
-        fs.writeFileSync(`./public/data/${todayDate()}-data.json`, jsonDataString, "utf-8");
-        // const main = fs.readFileSync("./public/main.html", "utf8");
-        // response.write(main);
+        for(let key in jsonData){
+          if(key==="title"){
+            console.log(`<h1>${jsonData[key]}</h1>`);
+          }
+          else if(key==="content"){
+            console.log(`<h3>${jsonData[key]}</h3>`);
+          }
+        }
         var testFolder = "./public/data"
         fs.readdir(testFolder, function (error, filelist) {
           
