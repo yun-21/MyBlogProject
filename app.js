@@ -83,9 +83,13 @@ const server = http.createServer((request, response) => {
         // response.write(main);
         var testFolder = "./public/data"
         fs.readdir(testFolder, function (error, filelist) {
-          // for (let i = 0; i < filelist.length; i++) {
-          //   var cook = `<li>${filelist[i]}</li>`;
-          // }
+          var array = [];
+          for (let i = 0; i < filelist.length; i++) {
+            array.push(filelist[i]);
+          }
+          for (let j = 0; j < array.length; j++) {
+            `root.innerHTML=<li>${array[j]}</li>`;
+          }
           const htmlcontent = `
           <!DOCTYPE html>
           <html lang="en">
@@ -100,16 +104,7 @@ const server = http.createServer((request, response) => {
           </body>
           <script>
           const root = document.getElementById("root");
-          
-          
-          const testArr = ${filelist.map((element) => element )};
-          console.log(testArr);
-          ${filelist.map(element => `
-          console.log(element)
-          const li = document.createElement('li'); 
-          li.textContent = element;
-          root.appendChild(li)`)};
-            
+          // root.innerHTML="";           
           const write = document.createElement('a');
           root.appendChild(write);
           write.href="../";
