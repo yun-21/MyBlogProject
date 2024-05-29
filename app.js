@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const todayDate = require("./public/todayDate");
+const path = require('path');
 
 const server = http.createServer((request, response) => {
   if (request.method === 'GET') {
@@ -63,8 +64,35 @@ const server = http.createServer((request, response) => {
           title: title,
           content: content
         };
+        let jsonDataString = JSON.stringify(jsonData, null, 2);
+        fs.writeFileSync(`./public/data/${todayDate()}-data.json`, jsonDataString, "utf-8");
+        const jsonArr = fs.readdir("./public/data", (error, file) => {
+          for (let i = 0; i < file.length; i++) {
+            const jsonData = JSON.parse(fs.readFileSync(`./public/data/${file[i]}`, "utf8"));
+            for (let key in jsonData) {
+              if (key === "title") {
+                var a = `<h1>${jsonData[key]}</h1>`;
+              }
+              else if (key === "content") {
+                var b = `<h3>${jsonData[key]}</h3>`;
+              }
+            }
+            const all =  `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Document</title>
+            </head>
+            <body>${a + b}
+            </body>
+            </html>`;
+            console.log(all);
+            fs.writeFileSync(`./public/dataHtml/${todayDate()}-data.html`, all, "utf-8");
+          }
+        });
         var testFolder = "./public/data";
-        
         fs.readdir(testFolder, function (error, filelist) {
           const htmlcontent = `
           <!DOCTYPE html>
@@ -76,9 +104,9 @@ const server = http.createServer((request, response) => {
           </head>
           <body>
             <ul>
-              ${filelist.map((file)=>{
-                return '<a href="writeData.html"><li>' + file + '</li></a>';
-              }).join('')}
+              ${filelist.map((file) => {
+            return `<li>` + file + '</li>';
+          }).join('')}
             </ul>
             <a href="../">메인화면</a>
           </body>
