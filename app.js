@@ -3,6 +3,7 @@ const fs = require('fs');
 const todayDate = require("./public/todayDate");
 const path = require('path');
 
+
 const server = http.createServer((request, response) => {
   if (request.method === 'GET') {
     if (request.url === '/') {
@@ -47,6 +48,11 @@ const server = http.createServer((request, response) => {
       response.write(write);
       response.end();
     }
+    // fs.readdir("./public/dataHtml", function (error, filelist) {
+    //   filelist.map((file) => {
+    //     return `<a href=./public/dataHtml/${file}><li>` + file + '</li></a>';
+    //   }).join('')
+    // });
   }
   else if (request.method === 'POST') {
     if (request.url === '/create') {
@@ -64,20 +70,15 @@ const server = http.createServer((request, response) => {
           title: title,
           content: content
         };
-        let jsonDataString = JSON.stringify(jsonData, null, 2);
-        fs.writeFileSync(`./public/data/${todayDate()}-data.json`, jsonDataString, "utf-8");
-        const jsonArr = fs.readdir("./public/data", (error, file) => {
-          for (let i = 0; i < file.length; i++) {
-            const jsonData = JSON.parse(fs.readFileSync(`./public/data/${file[i]}`, "utf8"));
-            for (let key in jsonData) {
-              if (key === "title") {
-                var a = `<h1>${jsonData[key]}</h1>`;
-              }
-              else if (key === "content") {
-                var b = `<h3>${jsonData[key]}</h3>`;
-              }
-            }
-            const all =  `
+        for (let key in jsonData) {
+          if (key === "title") {
+            var a = `<h1>${jsonData[key]}</h1>`;
+          }
+          else if (key === "content") {
+            var b = `<h3>${jsonData[key]}</h3>`;
+          }
+        }
+        const all = `
             <!DOCTYPE html>
             <html lang="en">
             <head>
@@ -88,11 +89,9 @@ const server = http.createServer((request, response) => {
             <body>${a + b}
             </body>
             </html>`;
-            console.log(all);
-            fs.writeFileSync(`./public/dataHtml/${todayDate()}-data.html`, all, "utf-8");
-          }
-        });
-        var testFolder = "./public/data";
+        console.log(all);
+        fs.writeFileSync(`./public/dataHtml/${todayDate()}-data.html`, all, "utf-8");
+        var testFolder = "./public/dataHtml";
         fs.readdir(testFolder, function (error, filelist) {
           const htmlcontent = `
           <!DOCTYPE html>
@@ -105,7 +104,9 @@ const server = http.createServer((request, response) => {
           <body>
             <ul>
               ${filelist.map((file) => {
-            return `<li>` + file + '</li>';
+                // `<a href=./public/dataHtml/${file}><li>` + file + '</li></a>';
+                // `<li><a href=./public/dataHtml/${file}>${file}<a/></li>`
+            return `<li><a href=./public/dataHtml/${file}>${file}<a/></li>`
           }).join('')}
             </ul>
             <a href="../">메인화면</a>
