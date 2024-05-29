@@ -46,20 +46,6 @@ const server = http.createServer((request, response) => {
       response.write(write);
       response.end();
     }
-    if (request.url === '/writeData.html') {
-      const writeData = fs.readFileSync("./public/writeData.html", "utf8");
-      response.statusCode = 200;
-      response.setHeader('Content-Type', 'text/html; charset=utf-8');
-      response.write(writeData);
-      response.end();
-    }
-    if (request.url === '/writeData.js') {
-      const writeDatajs = fs.readFileSync("./public/writeData.js", "utf8");
-      response.statusCode = 200;
-      response.setHeader('Content-Type', 'text/javascript; charset=utf-8');
-      response.write(writeDatajs);
-      response.end();
-    }
   }
   else if (request.method === 'POST') {
     if (request.url === '/create') {
@@ -77,17 +63,9 @@ const server = http.createServer((request, response) => {
           title: title,
           content: content
         };
-        for(let key in jsonData){
-          if(key==="title"){
-            console.log(`<h1>${jsonData[key]}</h1>`);
-          }
-          else if(key==="content"){
-            console.log(`<h3>${jsonData[key]}</h3>`);
-          }
-        }
-        var testFolder = "./public/data"
+        var testFolder = "./public/data";
+        
         fs.readdir(testFolder, function (error, filelist) {
-          
           const htmlcontent = `
           <!DOCTYPE html>
           <html lang="en">
