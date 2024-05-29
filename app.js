@@ -66,6 +66,22 @@ const server = http.createServer((request, response) => {
         };
         let jsonDataString = JSON.stringify(jsonData, null, 2);
         fs.writeFileSync(`./public/data/${todayDate()}-data.json`, jsonDataString, "utf-8");
+        
+        
+        fs.readdir("./public/data", (err, file) => {
+          for (let i = 0; i < file.length; i++) {
+            var fn1 = path.basename(`./public/data/${file[i]}`, '.json');
+          }
+          console.log(fn1);
+        })
+        fs.readdir("./public/dataHtml",(err,file)=>{
+          for(let i=0;i<file.length;i++){
+            var fn2 = path.basename(`./public/dataHtml/${file[i]}`, '.html');
+          }
+          console.log(fn2);
+        })
+      
+        
         const jsonArr = fs.readdir("./public/data", (error, file) => {
           for (let i = 0; i < file.length; i++) {
             const jsonData = JSON.parse(fs.readFileSync(`./public/data/${file[i]}`, "utf8"));
@@ -77,7 +93,10 @@ const server = http.createServer((request, response) => {
                 var b = `<h3>${jsonData[key]}</h3>`;
               }
             }
-            const all =  `
+
+            // const fn2 = path.basename("./public/dataHtml", '.html');
+
+            const all = `
             <!DOCTYPE html>
             <html lang="en">
             <head>
@@ -88,10 +107,11 @@ const server = http.createServer((request, response) => {
             <body>${a + b}
             </body>
             </html>`;
-            console.log(all);
             fs.writeFileSync(`./public/dataHtml/${todayDate()}-data.html`, all, "utf-8");
           }
         });
+
+
         var testFolder = "./public/data";
         fs.readdir(testFolder, function (error, filelist) {
           const htmlcontent = `
@@ -111,7 +131,6 @@ const server = http.createServer((request, response) => {
             <a href="../">메인화면</a>
           </body>
           </html>`
-          // console.log(filelist);
           response.write(htmlcontent);
           response.end();
         });
