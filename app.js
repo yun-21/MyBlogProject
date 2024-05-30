@@ -62,11 +62,6 @@ const server = http.createServer((request, response) => {
         response.end(data);
       }
     });
-    // fs.readdir("./public/dataHtml", function (error, filelist) {
-    //   filelist.map((file) => {
-    //     return `<a href=./public/dataHtml/${file}><li>` + file + '</li></a>';
-    //   }).join('')
-    // });
   }
   else if (request.method === 'POST') {
     if (request.url === '/create') {
@@ -120,8 +115,6 @@ const server = http.createServer((request, response) => {
           <body>
             <ul>
               ${filelist.map((file) => {
-            // `<a href=./public/dataHtml/${file}><li>` + file + '</li></a>';
-            // `<li><a href=./public/dataHtml/${file}>${file}<a/></li>`
             console.log(file);
             return `<li><a href=./dataHtml/${file}>${path.basename(file,".html")}<a/></li>`
           }).join('')}
@@ -129,7 +122,6 @@ const server = http.createServer((request, response) => {
             <a href="../">메인화면</a>
           </body>
           </html>`
-          // console.log(filelist);
           response.write(htmlcontent);
           response.end();
         });
