@@ -3,51 +3,65 @@ const fs = require('fs');
 const todayDate = require("./public/todayDate");
 const path = require('path');
 
+const mimeType = {
+  ".html": "text/html; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".js": "application/javascript; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".ico": "image/x-icon; charset=utf-8"
+};
+
+const fileUtils = {
+  getFilePath: function (url) {
+    let filePath;
+    if (url === "/") {
+      filePath = "./public/main.html";
+    }
+    else if(url ==="./public/dataHtml"){
+      filePath = url;
+    }
+    else {
+      filePath = "./public" + url;
+    }
+    return filePath;
+  },
+  getFileExtension: function (filePath) {
+    let ext = path.extname(filePath);
+    return ext.toLowerCase();
+  },
+  getContentType: function (ext) {
+    if (mimeType.hasOwnProperty(ext)) {
+      return mimeType[ext];
+    }
+    else {
+      return "text/plain";
+    }
+  }
+};
 
 const server = http.createServer((request, response) => {
+  console.log("URL 요청 데이터:", request.url);
+
+  let filePath = fileUtils.getFilePath(request.url);
+  let ext = fileUtils.getFileExtension(filePath);
+  let contentType = fileUtils.getContentType(ext);
   if (request.method === 'GET') {
-    if (request.url === '/') {
-      const main = fs.readFileSync("./public/main.html", "utf8");
-      response.statusCode = 200;
-      response.setHeader('Content-Type', 'text/html; charset=utf-8');
-      response.write(main);
-      response.end();
-    }
-    if (request.url === '/mainJs.js') {
-      const mainJs = fs.readFileSync("./public/mainJs.js", "utf8");
-      response.statusCode = 200;
-      response.setHeader('Content-Type', 'text/javascript; charset=utf-8');
-      response.write(mainJs);
-      response.end();
-    }
-    if (request.url === '/mainCss.css') {
-      const mainCss = fs.readFileSync("./public/mainCss.css", "utf8");
-      response.statusCode = 200;
-      response.setHeader('Content-Type', 'text/css; charset=utf-8');
-      response.write(mainCss);
-      response.end();
-    }
-    if (request.url === '/write.html') {
-      const write = fs.readFileSync("./public/write.html", "utf8");
-      response.statusCode = 200;
-      response.setHeader('Content-Type', 'text/html; charset=utf-8');
-      response.write(write);
-      response.end();
-    }
-    if (request.url === '/write.js') {
-      const write = fs.readFileSync("./public/write.js", "utf8");
-      response.statusCode = 200;
-      response.setHeader('Content-Type', 'text/javascript; charset=utf-8');
-      response.write(write);
-      response.end();
-    }
-    if (request.url === '/write.css') {
-      const write = fs.readFileSync("./public/write.css", "utf8");
-      response.statusCode = 200;
-      response.setHeader('Content-Type', 'text/css; charset=utf-8');
-      response.write(write);
-      response.end();
-    }
+    fs.readFile(filePath, (err, data) => {
+      if (err) {
+        if (err.code === "ENOENT") {
+          response.writeHead(404, { "Content-Type": "text/html" });
+          response.end("페이지를 찾을 수 없습니다.");
+        }
+        else {
+          response.writeHead(500);
+          response.end(`서버 오류: ${err.code}`);
+        }
+      }
+      else {
+        response.writeHead(200, { "Content-Type": contentType });
+        response.end(data);
+      }
+    });
     // fs.readdir("./public/dataHtml", function (error, filelist) {
     //   filelist.map((file) => {
     //     return `<a href=./public/dataHtml/${file}><li>` + file + '</li></a>';
@@ -86,7 +100,9 @@ const server = http.createServer((request, response) => {
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Document</title>
             </head>
-            <body>${a + b}
+            <body>
+            ${a + b}
+            <a href="./../">메인화면</a>
             </body>
             </html>`;
         console.log(all);
@@ -104,9 +120,10 @@ const server = http.createServer((request, response) => {
           <body>
             <ul>
               ${filelist.map((file) => {
-                // `<a href=./public/dataHtml/${file}><li>` + file + '</li></a>';
-                // `<li><a href=./public/dataHtml/${file}>${file}<a/></li>`
-            return `<li><a href=./public/dataHtml/${file}>${file}<a/></li>`
+            // `<a href=./public/dataHtml/${file}><li>` + file + '</li></a>';
+            // `<li><a href=./public/dataHtml/${file}>${file}<a/></li>`
+            console.log(file);
+            return `<li><a href=./dataHtml/${file}>${path.basename(file,".html")}<a/></li>`
           }).join('')}
             </ul>
             <a href="../">메인화면</a>
