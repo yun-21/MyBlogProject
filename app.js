@@ -17,8 +17,11 @@ const fileUtils = {
     if (url === "/") {
       filePath = "./public/main.html";
     }
-    else if(url ==="./public/dataHtml"){
+    else if (url === "./public/dataHtml") {
       filePath = url;
+    }
+    else if (url === "./create") {
+      request.method = "POST";
     }
     else {
       filePath = "./public" + url;
@@ -41,12 +44,13 @@ const fileUtils = {
 
 const server = http.createServer((request, response) => {
   console.log("URL 요청 데이터:", request.url);
+  console.log("URL 요청 메서드:", request.method);
 
   let filePath = fileUtils.getFilePath(request.url);
   let ext = fileUtils.getFileExtension(filePath);
   let contentType = fileUtils.getContentType(ext);
-  if (request.method === 'GET') {
-    fs.readFile(filePath, (err, data) => {
+  fs.readFile(filePath, (err, data) => {
+    if (request.url === filePath) {
       if (err) {
         if (err.code === "ENOENT") {
           response.writeHead(404, { "Content-Type": "text/html" });
@@ -61,33 +65,32 @@ const server = http.createServer((request, response) => {
         response.writeHead(200, { "Content-Type": contentType });
         response.end(data);
       }
-    });
-  }
-  else if (request.method === 'POST') {
-    if (request.url === '/create') {
-      response.statusCode = 200;
-      response.setHeader('Content-Type', 'text/html; charset=utf-8');
-      let body = "";
-      request.on('data', (chunk) => {
-        body += chunk;
-      });
-      request.on('end', () => {
-        const parseData = new URLSearchParams(body);
-        const title = parseData.get("title");
-        const content = parseData.get("content");
-        const jsonData = {
-          title: title,
-          content: content
-        };
-        for (let key in jsonData) {
-          if (key === "title") {
-            var a = `<h1>${jsonData[key]}</h1>`;
-          }
-          else if (key === "content") {
-            var b = `<h3>${jsonData[key]}</h3>`;
-          }
-        }
-        const all = `
+    }
+  });
+  if (request.url === '/create') {
+  response.statusCode = 200;
+  response.setHeader('Content-Type', 'text/html; charset=utf-8');
+  let body = "";
+  request.on('data', (chunk) => {
+    body += chunk;
+  });
+  request.on('end', () => {
+    const parseData = new URLSearchParams(body);
+    const title = parseData.get("title");
+    const content = parseData.get("content");
+    const jsonData = {
+      title: title,
+      content: content
+    };
+    for (let key in jsonData) {
+      if (key === "title") {
+        var a = `<h1>${jsonData[key]}</h1>`;
+      }
+      else if (key === "content") {
+        var b = `<h3>${jsonData[key]}</h3>`;
+      }
+    }
+    const all = `
             <!DOCTYPE html>
             <html lang="en">
             <head>
@@ -97,14 +100,14 @@ const server = http.createServer((request, response) => {
             </head>
             <body>
             ${a + b}
-            <a href="./../">메인화면</a>
+            <a href="../">메인화면</a>
             </body>
             </html>`;
-        console.log(all);
-        fs.writeFileSync(`./public/dataHtml/${todayDate()}-data.html`, all, "utf-8");
-        var testFolder = "./public/dataHtml";
-        fs.readdir(testFolder, function (error, filelist) {
-          const htmlcontent = `
+    console.log(all);
+    fs.writeFileSync(`./public/dataHtml/${todayDate()}-data.html`, all, "utf-8");
+    var testFolder = "./public/dataHtml";
+    fs.readdir(testFolder, function (error, filelist) {
+      const htmlcontent = `
           <!DOCTYPE html>
           <html lang="en">
           <head>
@@ -115,19 +118,18 @@ const server = http.createServer((request, response) => {
           <body>
             <ul>
               ${filelist.map((file) => {
-            console.log(file);
-            return `<li><a href=./dataHtml/${file}>${path.basename(file,".html")}<a/></li>`
-          }).join('')}
+        console.log(file);
+        return `<li><a href=./dataHtml/${file}>${path.basename(file, ".html")}<a/></li>`
+      }).join('')}
             </ul>
             <a href="../">메인화면</a>
           </body>
           </html>`
-          response.write(htmlcontent);
-          response.end();
-        });
-      });
-    }
-  }
+      response.write(htmlcontent);
+      response.end();
+    });
+  });
+}
 });
 
 server.listen(8080, (error) => {
