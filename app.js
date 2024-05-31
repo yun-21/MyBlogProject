@@ -79,8 +79,7 @@ const server = http.createServer((request, response) => {
           title: title,
           content: content
         };
-        // let array1 = [];
-        // let array2 = [];
+        
         for (let key in jsonData) {
           if (key === "title") {
             var a = `<h1>${jsonData[key]}</h1>`;
@@ -103,21 +102,20 @@ const server = http.createServer((request, response) => {
           <a href="./../">메인화면</a>
           </body>
           </html>`;
-          fs.readdir("./public/dataHtml",(error,filelist)=>{
-            for(let i=0; i<=filelist.length; i++){
-              console.log(filelist.length);
-              if(filelist.length === 0){
-                console.log("ddd");
-                fs.writeFileSync("./public/dataHtml/file0.html", all);
-              }
-              else if(filelist[i] !== `file${i}.html`){
-                console.log("ss");
+        fs.readdir("./public/dataHtml", (error, filelist) => {
+          if (filelist.includes('file.html') === false) {
+            fs.writeFileSync("./public/dataHtml/file.html", all);
+          }
+          else if (filelist.includes('file.html') === true) {
+            for (let i = 1; i <= filelist.length; i++) {
+              if (filelist.includes(`file${i}.html`) === false) {
                 fs.writeFileSync(`./public/dataHtml/file${i}.html`, all);
               }
             }
-          });
+          }
+        });
 
-        fs.readdir("./public/dataHtml", function (error, filelist) {
+        fs.readdir("./public/dataHtml", (error, filelist) => {
           const htmlcontent = `
           <!DOCTYPE html>
           <html lang="en">
@@ -139,6 +137,7 @@ const server = http.createServer((request, response) => {
           response.end();
         });
       });
+
     }
   }
 });
