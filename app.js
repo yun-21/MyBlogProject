@@ -100,8 +100,21 @@ const server = http.createServer((request, response) => {
             <a href="./../">메인화면</a>
             </body>
             </html>`;
-        console.log(all);
-        fs.writeFileSync(`./public/dataHtml/${todayDate()}-data.html`, all, "utf-8");
+        fs.writeFileSync(`./public/dataHtml/file.html`, all, (err,file)=>{
+          console.log("여기들어오나");
+          if(err){
+            console.error(err);
+          }
+          else{
+            fs.readdir("./public/dataHtml", (error, filelist)=>{
+              if (file === filelist){
+                for(let i=1; i<filelist.length; i++){
+                  fs.rename(file,file+i);
+                }
+              }
+            })
+          }
+        });
         var testFolder = "./public/dataHtml";
         fs.readdir(testFolder, function (error, filelist) {
           const htmlcontent = `
@@ -115,7 +128,6 @@ const server = http.createServer((request, response) => {
           <body>
             <ul>
               ${filelist.map((file) => {
-            console.log(file);
             return `<li><a href=./dataHtml/${file}>${path.basename(file,".html")}<a/></li>`
           }).join('')}
             </ul>
