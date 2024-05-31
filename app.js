@@ -100,21 +100,32 @@ const server = http.createServer((request, response) => {
             <a href="./../">메인화면</a>
             </body>
             </html>`;
-        fs.writeFileSync(`./public/dataHtml/file.html`, all, (err,file)=>{
-          console.log("여기들어오나");
-          if(err){
-            console.error(err);
-          }
-          else{
-            fs.readdir("./public/dataHtml", (error, filelist)=>{
-              if (file === filelist){
-                for(let i=1; i<filelist.length; i++){
-                  fs.rename(file,file+i);
-                }
+        if(parseData !== ''){
+          fs.readdir('./public/dataHtml',function (error, filelist){
+            console.log("첫번째");
+            for(let i=0; i<filelist.length; i++){
+              console.log("두번째");
+              if(filelist[i] === "file.html"){
+                console.log("세번째");
+                fs.rename("./public/dataHtml/file.html",`./public/dataHtml/file${i}.html`,(err)=>{
+                  if(err){
+                    console.log(err);
+                  }
+                });
               }
-            })
-          }
-        });
+              else if(filelist[i] ===`file${i}.html`){
+                console.log("네번째");
+                fs.rename(`./public/dataHtml/file${i}.html`,`./public/dataHtml/file${i+1}.html`,(err)=>{
+                  if(err){
+                    console.log(err);
+                  }
+                });
+              }
+            }
+          })
+          fs.writeFileSync(`./public/dataHtml/file.html`, all);
+        }
+
         var testFolder = "./public/dataHtml";
         fs.readdir(testFolder, function (error, filelist) {
           const htmlcontent = `
