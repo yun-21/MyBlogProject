@@ -17,7 +17,7 @@ const fileUtils = {
     if (url === "/") {
       filePath = "./public/main.html";
     }
-    else if(url ==="./public/dataHtml"){
+    else if (url === "./public/dataHtml") {
       filePath = url;
     }
     else {
@@ -79,6 +79,8 @@ const server = http.createServer((request, response) => {
           title: title,
           content: content
         };
+        // let array1 = [];
+        // let array2 = [];
         for (let key in jsonData) {
           if (key === "title") {
             var a = `<h1>${jsonData[key]}</h1>`;
@@ -87,47 +89,35 @@ const server = http.createServer((request, response) => {
             var b = `<h3>${jsonData[key]}</h3>`;
           }
         }
+        console.log(a, b);
         const all = `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Document</title>
-            </head>
-            <body>
-            ${a + b}
-            <a href="./../">메인화면</a>
-            </body>
-            </html>`;
-        if(parseData !== ''){
-          fs.readdir('./public/dataHtml',function (error, filelist){
-            console.log("첫번째");
-            for(let i=0; i<filelist.length; i++){
-              console.log("두번째");
-              if(filelist[i] === "file.html"){
-                console.log("세번째");
-                fs.rename("./public/dataHtml/file.html",`./public/dataHtml/file${i}.html`,(err)=>{
-                  if(err){
-                    console.log(err);
-                  }
-                });
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Document</title>
+          </head>
+          <body>
+          ${a + b}
+          <a href="./../">메인화면</a>
+          </body>
+          </html>`;
+          fs.readdir("./public/dataHtml",(error,filelist)=>{
+            for(let i=0; i<=filelist.length; i++){
+              console.log(filelist.length);
+              if(filelist.length === 0){
+                console.log("ddd");
+                fs.writeFileSync("./public/dataHtml/file0.html", all);
               }
-              else if(filelist[i] ===`file${i}.html`){
-                console.log("네번째");
-                fs.rename(`./public/dataHtml/file${i}.html`,`./public/dataHtml/file${i+1}.html`,(err)=>{
-                  if(err){
-                    console.log(err);
-                  }
-                });
+              else if(filelist[i] !== `file${i}.html`){
+                console.log("ss");
+                fs.writeFileSync(`./public/dataHtml/file${i}.html`, all);
               }
             }
-          })
-          fs.writeFileSync(`./public/dataHtml/file.html`, all);
-        }
+          });
 
-        var testFolder = "./public/dataHtml";
-        fs.readdir(testFolder, function (error, filelist) {
+        fs.readdir("./public/dataHtml", function (error, filelist) {
           const htmlcontent = `
           <!DOCTYPE html>
           <html lang="en">
@@ -139,7 +129,7 @@ const server = http.createServer((request, response) => {
           <body>
             <ul>
               ${filelist.map((file) => {
-            return `<li><a href=./dataHtml/${file}>${path.basename(file,".html")}<a/></li>`
+            return `<li><a href=./dataHtml/${file}>${path.basename(file, ".html")}<a/></li>`
           }).join('')}
             </ul>
             <a href="../">메인화면</a>
