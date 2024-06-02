@@ -91,8 +91,6 @@ const server = http.createServer((request, response) => {
           </body>
           </html>`;
       fs.writeFileSync(`./public/dataHtml/${title}.html`,all);
-      const buf = Buffer.from(title,'utf8');
-      console.log(buf);
       
       fs.readdir("./public/dataHtml", (error, filelist) => {
         const htmlcontent = `
@@ -106,7 +104,7 @@ const server = http.createServer((request, response) => {
           <body>
             <ul>
               ${filelist.map((file) => {
-          return `<li><a href=./public/dataHtml/${file}>${path.basename(file, ".html")}<a/></li>`
+          return `<li><a href=./public/dataHtml/${decodeURI(file)}>${path.basename(file, ".html")}<a/></li>`
         }).join('')}
             </ul>
             <a href="../">메인화면</a>
