@@ -1,6 +1,6 @@
 const http = require('http');
 const fs = require('fs');
-const todayDate = require("./public/todayDate");
+const Buffer = require('node:buffer');
 const path = require('path');
 
 const mimeType = {
@@ -17,8 +17,8 @@ const fileUtils = {
     if (url === "/") {
       filePath = "./public/main.html";
     }
-    else if (url === "./public/dataHtml") {
-      filePath = url;
+    else if(url ===`./public/dataHtml`){
+      filePath = `./public/dataHtml/${Buffer.toString("utf8")}`
     }
     else {
       filePath = "./public" + url;
@@ -40,8 +40,8 @@ const fileUtils = {
 };
 
 const server = http.createServer((request, response) => {
+  console.log("URL 요청 방식:", request.method);
   console.log("URL 요청 데이터:", request.url);
-
   let filePath = fileUtils.getFilePath(request.url);
   let ext = fileUtils.getFileExtension(filePath);
   let contentType = fileUtils.getContentType(ext);
@@ -49,7 +49,7 @@ const server = http.createServer((request, response) => {
     fs.readFile(filePath, (err, data) => {
       if (err) {
         if (err.code === "ENOENT") {
-          response.writeHead(404, { "Content-Type": "text/html" });
+          response.writeHead(404, { "Content-Type": "text/html; charset=utf-8" });
           response.end("페이지를 찾을 수 없습니다.");
         }
         else {
@@ -64,32 +64,19 @@ const server = http.createServer((request, response) => {
     });
   }
   else if (request.method === 'POST') {
-    if (request.url === '/create') {
-      response.statusCode = 200;
-      response.setHeader('Content-Type', 'text/html; charset=utf-8');
-      let body = "";
-      request.on('data', (chunk) => {
-        body += chunk;
-      });
-      request.on('end', () => {
-        const parseData = new URLSearchParams(body);
-        const title = parseData.get("title");
-        const content = parseData.get("content");
-        const jsonData = {
-          title: title,
-          content: content
-        };
-        
-        for (let key in jsonData) {
-          if (key === "title") {
-            var a = `<h1>${jsonData[key]}</h1>`;
-          }
-          else if (key === "content") {
-            var b = `<h3>${jsonData[key]}</h3>`;
-          }
-        }
-        console.log(a, b);
-        const all = `
+    response.statusCode = 200;
+    response.setHeader('Content-Type', 'text/html; charset=utf-8');
+    let body = "";
+    request.on('data', (chunk) => {
+      body += chunk;
+    });
+    request.on('end', () => {
+      const parseData = new URLSearchParams(body);
+      const title = parseData.get("title");
+      const content = parseData.get("content");
+      
+      console.log(title, content);
+      const all = `
           <!DOCTYPE html>
           <html lang="en">
           <head>
@@ -98,25 +85,17 @@ const server = http.createServer((request, response) => {
           <title>Document</title>
           </head>
           <body>
-          ${a + b}
-          <a href="./../">메인화면</a>
+          <h1>${title}</h1>
+          <h3>${content}</h3>
+          <a href="../">메인화면</a>
           </body>
           </html>`;
-        fs.readdir("./public/dataHtml", (error, filelist) => {
-          if (filelist.includes('file.html') === false) {
-            fs.writeFileSync("./public/dataHtml/file.html", all);
-          }
-          else if (filelist.includes('file.html') === true) {
-            for (let i = 1; i <= filelist.length; i++) {
-              if (filelist.includes(`file${i}.html`) === false) {
-                fs.writeFileSync(`./public/dataHtml/file${i}.html`, all);
-              }
-            }
-          }
-        });
-
-        fs.readdir("./public/dataHtml", (error, filelist) => {
-          const htmlcontent = `
+      fs.writeFileSync(`./public/dataHtml/${title}.html`,all);
+      const buf = Buffer.from(title,'utf8');
+      console.log(buf);
+      
+      fs.readdir("./public/dataHtml", (error, filelist) => {
+        const htmlcontent = `
           <!DOCTYPE html>
           <html lang="en">
           <head>
@@ -127,18 +106,17 @@ const server = http.createServer((request, response) => {
           <body>
             <ul>
               ${filelist.map((file) => {
-            return `<li><a href=./dataHtml/${file}>${path.basename(file, ".html")}<a/></li>`
-          }).join('')}
+          return `<li><a href=./public/dataHtml/${file}>${path.basename(file, ".html")}<a/></li>`
+        }).join('')}
             </ul>
             <a href="../">메인화면</a>
           </body>
           </html>`
-          response.write(htmlcontent);
-          response.end();
-        });
+        response.write(htmlcontent);
+        response.end();
       });
+    });
 
-    }
   }
 });
 
