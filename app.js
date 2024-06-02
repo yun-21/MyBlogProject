@@ -17,7 +17,7 @@ const fileUtils = {
     if (url === "/") {
       filePath = "./public/main.html";
     }
-    else if(url ===`./public/dataHtml`){
+    else if (url === `./public/dataHtml`) {
       filePath = `./public/dataHtml/${Buffer.toString("utf8")}`
     }
     else {
@@ -38,6 +38,27 @@ const fileUtils = {
     }
   }
 };
+function refile() {
+  fs.readdir("./public/dataHtml", (error, filelist) => {
+    `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Document</title>
+      </head>
+      <body>
+        <ul>
+          ${filelist.map((file) => {
+      return `<li><a href=./public/dataHtml/${file}>${path.basename(file, ".html")}<a/></li>`
+    }).join('')}
+        </ul>
+        <a href="../">메인화면</a>
+      </body>
+      </html>`
+  });
+}
 
 const server = http.createServer((request, response) => {
   console.log("URL 요청 방식:", request.method);
@@ -74,7 +95,7 @@ const server = http.createServer((request, response) => {
       const parseData = new URLSearchParams(body);
       const title = parseData.get("title");
       const content = parseData.get("content");
-      
+
       console.log(title, content);
       const all = `
           <!DOCTYPE html>
@@ -90,33 +111,11 @@ const server = http.createServer((request, response) => {
           <a href="../">메인화면</a>
           </body>
           </html>`;
-      fs.writeFileSync(`./public/dataHtml/${title}.html`,all);
-      const buf = Buffer.from(title,'utf8');
-      console.log(buf);
-      
-      fs.readdir("./public/dataHtml", (error, filelist) => {
-        const htmlcontent = `
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Document</title>
-          </head>
-          <body>
-            <ul>
-              ${filelist.map((file) => {
-          return `<li><a href=./public/dataHtml/${file}>${path.basename(file, ".html")}<a/></li>`
-        }).join('')}
-            </ul>
-            <a href="../">메인화면</a>
-          </body>
-          </html>`
-        response.write(htmlcontent);
-        response.end();
+      fs.writeFile(`./public/dataHtml/${title}.html`, all, 'utf8', function (err) {
+        response.writeHead(302, { location: encodeURI(`/?id=${title}`) })
+        response.end(refile());
       });
     });
-
   }
 });
 
