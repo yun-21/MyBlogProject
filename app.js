@@ -75,20 +75,21 @@ const server = http.createServer((request, response) => {
         const parseData = new URLSearchParams(body);
         const title = parseData.get("title");
         const content = parseData.get("content");
-        const jsonData = {
-          title: title,
-          content: content
-        };
+        const jsonData = [
+          title,
+          content
+        ];
+        const arrData = [];
         
-        for (let key in jsonData) {
-          if (key === "title") {
-            var a = `<h1>${jsonData[key]}</h1>`;
+        jsonData.forEach((element,index)=>{
+          if(index === 0){
+            arrData.push(`<h1>${element}</h1>`)
           }
-          else if (key === "content") {
-            var b = `<h3>${jsonData[key]}</h3>`;
+          else if(index === 1){
+            arrData.push(`<h3>${element}</h3>`)
           }
-        }
-        console.log(a, b);
+        })
+        
         const all = `
           <!DOCTYPE html>
           <html lang="en">
@@ -98,7 +99,7 @@ const server = http.createServer((request, response) => {
           <title>Document</title>
           </head>
           <body>
-          ${a + b}
+          ${arrData[0] + arrData[1]}
           <a href="./../">메인화면</a>
           </body>
           </html>`;
