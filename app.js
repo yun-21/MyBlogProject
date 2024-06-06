@@ -23,7 +23,7 @@ const fileUtils = {
     else {
       filePath = "./public" + url;
     }
-    return filePath;
+    return decodeURI(filePath);
   },
   getFileExtension: function (filePath) {
     let ext = path.extname(filePath);
@@ -75,68 +75,61 @@ const server = http.createServer((request, response) => {
         const parseData = new URLSearchParams(body);
         const title = parseData.get("title");
         const content = parseData.get("content");
-        const jsonData = [
-          title,
-          content
-        ];
-        const arrData = [];
-        
-        jsonData.forEach((element,index)=>{
-          if(index === 0){
-            arrData.push(`<h1>${element}</h1>`)
+        const jsonData = {
+          title: title,
+          content: content
+        };
+        fs.readdir("./public/dataHtml", (err, filel) => {
+          console.log("Dd")
+          if (filel.includes(`${jsonData.title}.html`) === true) {
+            console.log("파일있을때")
+            const htmlcontent =
+              `<h1>이 제목의 파일이 이미 있습니다.</h1><h4><a href="../">돌아가기</a></h4>`
+            response.write(htmlcontent);
+            response.end();
           }
-          else if(index === 1){
-            arrData.push(`<h3>${element}</h3>`)
+          else if (filel.includes(`${jsonData.title}.html`) === false) {
+            console.log("파일없을때")
+            const all = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                  <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Document</title>
+                </head>
+                <body>
+                <h1>${jsonData.title}</h1>
+                <h3>${jsonData.content}</h3>
+                <a href="./../">메인화면</a>
+                </body>
+                </html>`;
+            fs.writeFileSync(`./public/dataHtml/${jsonData.title}.html`, all);
+            fs.readdir("./public/dataHtml", (error, filelist) => {
+              const htmlcontent = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                  <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Document</title>
+                </head>
+                <body>
+                  <ul>
+                    ${filelist.map((file) => {
+                return `<li><a href=./dataHtml/${file}>${path.basename(file, ".html")}<a/></li>`
+              }).join('')}
+                  </ul>
+                  <a href="../">메인화면</a>
+                </body>
+                </html>`
+              response.write(htmlcontent);
+              response.end();
+            });
           }
         })
-        
-        const all = `
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Document</title>
-          </head>
-          <body>
-          ${arrData[0] + arrData[1]}
-          <a href="./../">메인화면</a>
-          </body>
-          </html>`;
-        fs.readdir("./public/dataHtml", (error, filelist) => {
-          if (filelist.includes('file.html') === false) {
-            fs.writeFileSync("./public/dataHtml/file.html", all);
-          }
-          else if (filelist.includes('file.html') === true) {
-            for (let i = 1; i <= filelist.length; i++) {
-              if (filelist.includes(`file${i}.html`) === false) {
-                fs.writeFileSync(`./public/dataHtml/file${i}.html`, all);
-              }
-            }
-          }
-        });
 
-        fs.readdir("./public/dataHtml", (error, filelist) => {
-          const htmlcontent = `
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Document</title>
-          </head>
-          <body>
-            <ul>
-              ${filelist.map((file) => {
-            return `<li><a href=./dataHtml/${file}>${path.basename(file, ".html")}<a/></li>`
-          }).join('')}
-            </ul>
-            <a href="../">메인화면</a>
-          </body>
-          </html>`
-          response.write(htmlcontent);
-          response.end();
-        });
+
       });
 
     }
