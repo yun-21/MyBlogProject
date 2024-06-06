@@ -17,13 +17,10 @@ const fileUtils = {
     if (url === "/") {
       filePath = "./public/main.html";
     }
-    else if(url ===`./public/dataHtml`){
-      filePath = `./public/dataHtml/${Buffer.toString("utf8")}`
-    }
     else {
       filePath = "./public" + url;
     }
-    return filePath;
+    return decodeURI(filePath);
   },
   getFileExtension: function (filePath) {
     let ext = path.extname(filePath);
@@ -74,7 +71,7 @@ const server = http.createServer((request, response) => {
       const parseData = new URLSearchParams(body);
       const title = parseData.get("title");
       const content = parseData.get("content");
-      
+
       console.log(title, content);
       const all = `
           <!DOCTYPE html>
@@ -90,10 +87,9 @@ const server = http.createServer((request, response) => {
           <a href="../">메인화면</a>
           </body>
           </html>`;
-      fs.writeFileSync(`./public/dataHtml/${title}.html`,all);
-      const buf = Buffer.from(title,'utf8');
-      console.log(buf);
-      
+
+
+      fs.writeFileSync(`./public/dataHtml/${title}.html`, all);
       fs.readdir("./public/dataHtml", (error, filelist) => {
         const htmlcontent = `
           <!DOCTYPE html>
@@ -106,7 +102,7 @@ const server = http.createServer((request, response) => {
           <body>
             <ul>
               ${filelist.map((file) => {
-          return `<li><a href=./public/dataHtml/${file}>${path.basename(file, ".html")}<a/></li>`
+          return `<li><a href="./dataHtml/${file}">${path.basename(file, ".html")}<a/></li>`
         }).join('')}
             </ul>
             <a href="../">메인화면</a>
