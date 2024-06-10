@@ -33,6 +33,16 @@ elementCreate(blogContent, "writePage", "a", "writePage");
 writePage.href="write.html";
 writePage.innerHTML="글쓰기";
 
-// elementCreate(blogContent, "jsonData", "div", "jsonData");
-// const lool = JSON.parse(fs.readFileSync("data.json","utf-8"));
-// jsonData.innerHTML=lool;
+const blogleft = document.getElementById("blogleft");
+elementCreate(blogleft, "blogList", "div", "blogList");
+elementCreate(blogleft, "blogListContent", "div", "blogListContent");
+
+const blogList = document.getElementById('blogList');
+blogList.style.textAlign="center"
+blogList.innerHTML="목록"
+
+const blogListContent = document.getElementById('blogListContent');
+blogListContent.innerHTML="dd"
+blogList.addEventListener('mouseover',()=>{
+})
+
