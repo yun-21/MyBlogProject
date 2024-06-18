@@ -47,6 +47,7 @@ function goPost(){
   let form=document.createElement('form');
   blogListContent.appendChild(form);
   form.method='post';
+  //submit()메서드는 동적으로 폼을 생성하고 서버에 보내고자 할 때 사용합니다.
   form.submit();
 }
 
